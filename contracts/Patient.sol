@@ -2,13 +2,10 @@ pragma solidity >=0.5.16;
 pragma experimental ABIEncoderV2;
 import "./Consultation.sol";
 
-contract PatientIndex{
-   // Patient mapping
-    mapping(address => uint) private addressToIndex;
-    mapping(bytes32 => uint) private patientnameToIndex;
-    address[] private addresses;
-    bytes32[] private patientUnames;
-    bytes[] private ipfsHashes;
+contract Patient{
+    address private addr;
+    bytes32 private patientuname;
+    bytes private IpfsHash;
 
     // Consultation mapping
     mapping(bytes32 => uint) private consulDateIDToIndex;
@@ -18,159 +15,56 @@ contract PatientIndex{
     // patient address to consultations
     mapping(address => bytes32[]) paddressToConsulArray;
     mapping(address => bytes[]) paddressToConsulIpfsArray;
-    bytes32[] consultations;
+    bytes32[] consIDs;
     bytes[] private consulIPFShashes;
 
+    event NewConsultationCreadted(bytes32 pname, bytes32 consID);
 
-function consultationCreate(bytes32 _pname, bytes32 _consulDateID,
-   bytes memory _ipfsConsulHash, bytes memory newPatientIpfs)public returns(bool){
-   // Create new consultation with ID and its IPFS Hash
-   new Consultation(_consulDateID, _ipfsConsulHash);
-   consultations.push(_consulDateID);
-   consulIPFShashes.push(_ipfsConsulHash);
-   consulDateIDToIndex[_consulDateID] = consultations.length;
-   pnameToConsulArray[_pname] = consultations;
-   pnameToConsulIpfsArray[_pname] = consulIPFShashes;
-   paddressToConsulArray[msg.sender] = consultations;
-   paddressToConsulIpfsArray[msg.sender] = consulIPFShashes;
-   // Consultations hash append to patient ipfs storage
-   updatePatient(newPatientIpfs);
-   // emit cons.consultationCreated(_pname, _consulDateID);
-   return true;
+    constructor(bytes32 _patientuname,bytes memory _IpfsHash) public{
+        addr = msg.sender;
+        patientuname = _patientuname;
+        IpfsHash = _IpfsHash;
+    }
 
-}
+    function updatePatient(bytes memory ipfsHash) public returns(bool){
+        IpfsHash = ipfsHash;
+        return true;
+    }
 
-function getConsultationByConsultationIndex(uint _index) public view returns(bytes32 consulID, bytes memory ipfs){
-   return (consultations[_index], consulIPFShashes[_index]);
-}
+    function consultationCreate(bytes32 _pname, bytes32 _consulDateID,
+        bytes memory _ipfsConsulHash, bytes memory newPatientIpfs)public returns(bool){
+        // Create new consultation with ID and its IPFS Hash
+        new Consultation(_consulDateID, _ipfsConsulHash);
+        consIDs.push(_consulDateID);
+        consulIPFShashes.push(_ipfsConsulHash);
+        consulDateIDToIndex[_consulDateID] = consIDs.length;
+        pnameToConsulArray[_pname] = consIDs;
+        pnameToConsulIpfsArray[_pname] = consulIPFShashes;
+        paddressToConsulArray[msg.sender] = consIDs;
+        paddressToConsulIpfsArray[msg.sender] = consulIPFShashes;
+        // Consultations hash append to patient ipfs storage
+        updatePatient(newPatientIpfs);
+        emit NewConsultationCreadted(_pname, _consulDateID);
+        return true;
+    }
 
-function getConsultationIpfsByConsultationID(bytes32 _consulDateID) public view returns(bytes memory ipfs){
-   return consulIPFShashes[consulDateIDToIndex[_consulDateID]];
-}
+    function getConsultationByConsultationIndex(uint _index) public view returns(bytes32 consulID, bytes memory ipfs){
+        return (consIDs[_index], consulIPFShashes[_index]);
+    }
 
-function getConsultationIndexByConsultationID(bytes32 _consulDateID) public view returns(uint){
-   return consulDateIDToIndex[_consulDateID];
-}
+    function getConsultationIpfsByConsultationID(bytes32 _consulDateID) public view returns(bytes memory ipfs){
+        return consulIPFShashes[consulDateIDToIndex[_consulDateID]];
+    }
 
-function getConsultationsByPatientName(bytes32 _pname) public view returns(bytes32[] memory, bytes[] memory) {
-   require(hasPatient(getAddressByPatientName(_pname)),
-          "Patient hasn't been found");
-   return (pnameToConsulArray[_pname], pnameToConsulIpfsArray[_pname]);
-}
+    function getConsultationIndexByConsultationID(bytes32 _consulDateID) public view returns(uint){
+        return consulDateIDToIndex[_consulDateID];
+    }
 
-function getConsultationsByPatientAddress(address patientAddress) public view returns(bytes32[] memory, bytes[] memory){
-   require(hasPatient(patientAddress),
-          "Patient hasn't been found");
-   return(paddressToConsulArray[patientAddress],paddressToConsulIpfsArray[patientAddress]);
-}
+    function getConsultationsByPatientName(bytes32 _pname) public view returns(bytes32[] memory, bytes[] memory) {
+        return (pnameToConsulArray[_pname], pnameToConsulIpfsArray[_pname]);
+    }
 
-
- constructor() public{
-        addresses.push(msg.sender);
-        patientUnames.push('x');
-        ipfsHashes.push('not-available');
- }
-
- function hasPatient(address _patientAdresses) public view returns(bool) {
-   return (addressToIndex[_patientAdresses] > 0 || _patientAdresses == addresses[0]);
- }
-
- function patientNameTaken(bytes32 pname) public view returns(bool takenIndeed) {
-   return (patientnameToIndex[pname] > 0 || pname == 'self');
- }
-
- function registerPatient(bytes32 patientName, bytes memory ipfsHash) public returns(bool) {
-   require(!hasPatient(msg.sender),
-           "Sender not authorized.");
-   require(!patientNameTaken(patientName),
-           "Patient name has been taken.");
-   addresses.push(msg.sender);
-   patientUnames.push(patientName);
-   ipfsHashes.push(ipfsHash);
-   addressToIndex[msg.sender] = addresses.length - 1;
-   patientnameToIndex[patientName] = addresses.length - 1;
-   return true;
- }
-
- function updatePatient(bytes memory ipfsHash) public returns(bool){
-    require(!hasPatient(msg.sender),
-            "Sender not authorized.");
-    ipfsHashes[addressToIndex[msg.sender]] = ipfsHash;
-    return true;
- }
-
- function getPatientCount() public view returns(uint){
-    return addresses.length;
- }
-
- function getPatientByIndex(uint index) public view returns(address,bytes32,bytes memory){
-    require((index < addresses.length),
-            "Index out of bound!");
-    return(addresses[index], patientUnames[index], ipfsHashes[index]);
- }
-
- function getAddressesByIndex(uint index) public view returns(address){
-    require((index < addresses.length),
-            "Index out of bound!");
-    return addresses[index];
- }
-
- function getPatientNameByIndex(uint index) public view returns(bytes32){
-    require((index < addresses.length),
-            "Index out of bound!");
-    return patientUnames[index];
- }
-
- function getIpfsHashByIndex(uint index) public view returns(bytes memory){
-    require((index < addresses.length),
-            "Index out of bound!");
-    return ipfsHashes[index];
- }
-
- function getPatientByAddress(address patientAddress) public view returns(uint, bytes32, bytes memory){
-    require(hasPatient(patientAddress),
-            "Patient doesn't exist!");
-    return(addressToIndex[patientAddress], patientUnames[addressToIndex[patientAddress]], ipfsHashes[addressToIndex[patientAddress]]);
- }
-
- function getIndexByAddress(address patientAddress) public view returns(uint){
-    require(hasPatient(patientAddress),
-            "Patient doesn't exist!");
-    return addressToIndex[patientAddress];
- }
-
- function getPatientNameByAddress(address patientAddress) public view returns(bytes32){
-    require(hasPatient(patientAddress),
-            "Patient doesn't exist!");
-    return patientUnames[addressToIndex[patientAddress]];
- }
-
- function getIpfsHashByAddress(address patientAddress) public view returns(bytes memory){
-    require(hasPatient(patientAddress),
-            "Patient doesn't exist!");
-    return ipfsHashes[addressToIndex[patientAddress]];
- }
-
- function getPatientByPatientName(bytes32 patientname) public view returns(uint,address,bytes memory){
-    require((patientnameToIndex[patientname] < addresses.length),
-            "Patient index out of bound!");
-    return(patientnameToIndex[patientname], addresses[patientnameToIndex[patientname]], ipfsHashes[patientnameToIndex[patientname]]);
- }
-
- function getIndexByPatientName(bytes32 patientname) public view returns(uint){
-    require((patientNameTaken(patientname)),
-        "Can't find the patient!");
-    return patientnameToIndex[patientname];
- }
-
- function getAddressByPatientName(bytes32 patientname) public view returns(address){
-    require((patientNameTaken(patientname)),
-        "Can't find the patient!");
-    return addresses[patientnameToIndex[patientname]];
- }
- function getIpfsHashByPatientName(bytes32 patientname) public view returns(bytes memory){
-    require((patientNameTaken(patientname)),
-            "Can't find the patient!");
-    return ipfsHashes[patientnameToIndex[patientname]];
- }
+    function getConsultationsByPatientAddress(address patientAddress) public view returns(bytes32[] memory, bytes[] memory){
+        return(paddressToConsulArray[patientAddress],paddressToConsulIpfsArray[patientAddress]);
+    }
 }
