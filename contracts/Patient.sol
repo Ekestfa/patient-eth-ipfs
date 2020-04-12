@@ -1,6 +1,7 @@
 pragma solidity >=0.5.16;
 pragma experimental ABIEncoderV2;
 import "./Consultation.sol";
+import "./Test.sol";
 
 contract Patient{
     address private addr;
@@ -9,62 +10,91 @@ contract Patient{
 
     // Consultation mapping
     mapping(bytes32 => uint) private consulDateIDToIndex;
-    // patient name to consultations
     mapping(bytes32 => bytes32[]) pnameToConsulArray;
-    mapping(bytes32 => bytes[]) pnameToConsulIpfsArray;
-    // patient address to consultations
     mapping(address => bytes32[]) paddressToConsulArray;
-    mapping(address => bytes[]) paddressToConsulIpfsArray;
     bytes32[] consIDs;
-    bytes[] private consulIPFShashes;
 
-    event NewConsultationCreadted(bytes32 pname, bytes32 consID);
+    // Test mapping
+
+    mapping(bytes32 => uint) private testDateIDToIndex;
+    mapping(bytes32 => bytes32[]) pnameToTestArray;
+    mapping(address => bytes32[]) paddressToTestArray;
+    bytes32[] testIDs;
+
+    event NewConsultationCreated(bytes32 pname, bytes32 consID);
+    event NewTestCreated(bytes32 pname, bytes32 testID);
 
     constructor(bytes32 _patientuname,bytes memory _IpfsHash) public{
         addr = msg.sender;
         patientuname = _patientuname;
         IpfsHash = _IpfsHash;
-    }
+     }
 
     function updatePatient(bytes memory ipfsHash) public returns(bool){
         IpfsHash = ipfsHash;
         return true;
-    }
+     }
 
-    function consultationCreate(bytes32 _pname, bytes32 _consulDateID,
-        bytes memory _ipfsConsulHash, bytes memory newPatientIpfs)public returns(bool){
-        // Create new consultation with ID and its IPFS Hash
-        new Consultation(_consulDateID, _ipfsConsulHash);
+    function consultationCreate(bytes32 _pname, bytes32 _consulDateID, bytes memory newPatientIpfs)public returns(bool){
+        // Create new consultation with ID
+        new Consultation(msg.sender, _pname, _consulDateID);
         consIDs.push(_consulDateID);
-        consulIPFShashes.push(_ipfsConsulHash);
         consulDateIDToIndex[_consulDateID] = consIDs.length;
         pnameToConsulArray[_pname] = consIDs;
-        pnameToConsulIpfsArray[_pname] = consulIPFShashes;
         paddressToConsulArray[msg.sender] = consIDs;
-        paddressToConsulIpfsArray[msg.sender] = consulIPFShashes;
         // Consultations hash append to patient ipfs storage
         updatePatient(newPatientIpfs);
-        emit NewConsultationCreadted(_pname, _consulDateID);
+        emit NewConsultationCreated(_pname, _consulDateID);
         return true;
-    }
+     }
 
-    function getConsultationByConsultationIndex(uint _index) public view returns(bytes32 consulID, bytes memory ipfs){
-        return (consIDs[_index], consulIPFShashes[_index]);
-    }
-
-    function getConsultationIpfsByConsultationID(bytes32 _consulDateID) public view returns(bytes memory ipfs){
-        return consulIPFShashes[consulDateIDToIndex[_consulDateID]];
-    }
+    function getConsultationByConsultationIndex(uint _index) public view returns(bytes32 consulID){
+        return (consIDs[_index]);
+     }
 
     function getConsultationIndexByConsultationID(bytes32 _consulDateID) public view returns(uint){
         return consulDateIDToIndex[_consulDateID];
-    }
+     }
 
-    function getConsultationsByPatientName(bytes32 _pname) public view returns(bytes32[] memory, bytes[] memory) {
-        return (pnameToConsulArray[_pname], pnameToConsulIpfsArray[_pname]);
-    }
+    function getConsultationsByPatientName(bytes32 _pname) public view returns(bytes32[] memory) {
+        return (pnameToConsulArray[_pname]);
+     }
 
-    function getConsultationsByPatientAddress(address patientAddress) public view returns(bytes32[] memory, bytes[] memory){
-        return(paddressToConsulArray[patientAddress],paddressToConsulIpfsArray[patientAddress]);
-    }
+    function getConsultationsByPatientAddress(address patientAddress) public view returns(bytes32[] memory){
+        return(paddressToConsulArray[patientAddress]);
+     }
+    function getConsultationsCount() public view returns (uint){
+        return consIDs.length;
+     }
+    function testCreate(bytes32 _pname, bytes32 _testDateID, bytes memory newPatientIpfs)public returns(bool){
+        // Create new test with ID
+        new Test(msg.sender, _pname, _testDateID);
+        testIDs.push(_testDateID);
+        testDateIDToIndex[_testDateID] = testIDs.length;
+        pnameToTestArray[_pname] = testIDs;
+        paddressToTestArray[msg.sender] = testIDs;
+        // Consultations hash append to patient ipfs storage
+        updatePatient(newPatientIpfs);
+        emit NewTestCreated(_pname, _testDateID);
+        return true;
+     }
+
+    function getTestByTestIndex(uint _index) public view returns(bytes32 testID){
+        return (testIDs[_index]);
+     }
+
+    function getTestIndexByTestID(bytes32 _testDateID) public view returns(uint){
+        return testDateIDToIndex[_testDateID];
+     }
+
+    function getTestsByPatientName(bytes32 _pname) public view returns(bytes32[] memory) {
+        return (pnameToTestArray[_pname]);
+     }
+
+    function getTestsByPatientAddress(address patientAddress) public view returns(bytes32[] memory){
+        return(paddressToConsulArray[patientAddress]);
+     }
+    function getTestsCount() public view returns (uint){
+        return testIDs.length;
+     }
 }

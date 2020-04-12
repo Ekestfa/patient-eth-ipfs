@@ -1,13 +1,14 @@
 pragma solidity >=0.5.16;
 
 contract Consultation {
-    // Consultation mapping
+    address addr;
+    bytes32 patientuname;
     bytes32 private consulDateID;
-    bytes private ipfsConsulHash;
-    // event consultationCreated(bytes32 pname, bytes32 _consulDateID);
 
-    constructor(bytes32 _consulDateID, bytes memory _ipfsConsulHash) public{
+
+    constructor(address _addr, bytes32 _patientuname, bytes32 _consulDateID) public{
+      addr = _addr;
+      patientuname = _patientuname;
       consulDateID = _consulDateID;
-      ipfsConsulHash = _ipfsConsulHash;
   }
 }
