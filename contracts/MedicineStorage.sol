@@ -18,7 +18,7 @@ contract MedicineStorage{
         mednameToMedicine[mname] = new Medicine(mname, ipfsHash);
         medicineNames.push(mname);
         medIpfsHash.push(ipfsHash);
-        medicinenameToIndex[mname] = medicineNames.length;
+        medicinenameToIndex[mname] = medicineNames.length - 1;
         return true;
      }
     function updateMedicine(bytes memory ipfsHash) public returns(bool){
@@ -51,7 +51,7 @@ contract MedicineStorage{
             "Index out of bound!");
       return medIpfsHash[index];
      }
-    function getIpfsHashByPatientName(bytes32 mname) public view returns(bytes memory){
+    function getIpfsHashByMedicineName(bytes32 mname) public view returns(bytes memory){
        return medIpfsHash[medicinenameToIndex[mname]];
      }
 }

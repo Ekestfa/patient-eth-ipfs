@@ -1,3 +1,17 @@
+import web3 from 'web3'
+import {ethers} from 'ethers';
+import client from '../abi/ClientFactory.json'
+import contract from 'truffle-contract';
+import {ethers} from 'ethers';
+
+// // array in local storage for registered users
+// let users = JSON.parse(localStorage.getItem('users')) || [];
+
+var DeployedClient = contract(client);
+const web3 = new Web3(Web3.givenProvider || "http://localhost:7545" );
+const ethereum = window.ethereum;
+const IPFS = require('ipfs-http-client');
+const ipfs = new IPFS({host:'ipfs.infura.io', port:'5001', protocol: 'HTTPS'});
 
 
 
@@ -17,7 +31,7 @@ ipfs.add(valuesBuffer, (error, result) =>{
     return
   }
   console.log(result[0].hash)
-  Patient.deployed().then(function(contractInstance){
+  DeployedClient.deployed().then(function(contractInstance){
     contractInstance.registerPatient(usnameByte32, Buffer.from(result[0].hash),{gas: 6721975 ,from: ethereum.selectedAddress}).then(function(success){
         console.log("fake-backend register-CONTRACT REGISTER")
       if(success){

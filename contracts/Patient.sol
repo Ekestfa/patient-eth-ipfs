@@ -7,11 +7,13 @@ contract Patient{
     address private addr;
     bytes32 private patientuname;
     bytes private IpfsHash;
+    Consultation c;
 
     // Consultation mapping
     mapping(bytes32 => uint) private consulDateIDToIndex;
     mapping(bytes32 => bytes32[]) pnameToConsulArray;
     mapping(address => bytes32[]) paddressToConsulArray;
+    mapping(bytes32 => Consultation) consulDateIDToCons;
     bytes32[] consIDs;
 
     // Test mapping
@@ -23,18 +25,19 @@ contract Patient{
 
     event NewConsultationCreated(bytes32 pname, bytes32 consID);
     event NewTestCreated(bytes32 pname, bytes32 testID);
+    event NewMedicineCreatedForPatient(bytes32 pname, bytes32 consID, bytes32 medname);
 
     constructor(bytes32 _patientuname,bytes memory _IpfsHash) public{
         addr = msg.sender;
         patientuname = _patientuname;
         IpfsHash = _IpfsHash;
      }
-
     function updatePatient(bytes memory ipfsHash) public returns(bool){
         IpfsHash = ipfsHash;
         return true;
      }
 
+    // CONSULTATIONS
     function consultationCreate(bytes32 _pname, bytes32 _consulDateID, bytes memory newPatientIpfs)public returns(bool){
         // Create new consultation with ID
         new Consultation(msg.sender, _pname, _consulDateID);
@@ -42,6 +45,7 @@ contract Patient{
         consulDateIDToIndex[_consulDateID] = consIDs.length;
         pnameToConsulArray[_pname] = consIDs;
         paddressToConsulArray[msg.sender] = consIDs;
+        consulDateIDToCons[_consulDateID] = c;
         // Consultations hash append to patient ipfs storage
         updatePatient(newPatientIpfs);
         emit NewConsultationCreated(_pname, _consulDateID);
@@ -66,6 +70,7 @@ contract Patient{
     function getConsultationsCount() public view returns (uint){
         return consIDs.length;
      }
+    // TESTS
     function testCreate(bytes32 _pname, bytes32 _testDateID, bytes memory newPatientIpfs)public returns(bool){
         // Create new test with ID
         new Test(msg.sender, _pname, _testDateID);
@@ -96,5 +101,21 @@ contract Patient{
      }
     function getTestsCount() public view returns (uint){
         return testIDs.length;
+     }
+
+    function saveMedicineForPatientUse(bytes32 _consulDateID, bytes32 mname) public returns(bool){
+        return consulDateIDToCons[_consulDateID].saveMedicineForPatientUse(mname);
+     }
+    function getMedicinesFromConsultation(bytes32 _consulDateID) public view returns(bytes32[] memory){
+        return consulDateIDToCons[_consulDateID].getMedicinesFromConsultation();
+     }
+    function getMedicineByIndex(bytes32 _consulDateID,uint index) public view returns(bytes32){
+        return consulDateIDToCons[_consulDateID].getMedicineByIndex(index);
+     }
+    function getMedicineByMedicineName(bytes32 _consulDateID, bytes32 medname)public view returns(bytes32){
+        return consulDateIDToCons[_consulDateID].getMedicineByMedicineName(medname);
+     }
+    function getMedicinesCountFromConsultation(bytes32 _consulDateID) public view returns(uint){
+        return consulDateIDToCons[_consulDateID].getMedicinesCountFromConsultation();
      }
 }

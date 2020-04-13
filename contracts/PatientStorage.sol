@@ -10,13 +10,14 @@ contract PatientStorage {
    bytes[] private ipfsHashes;
    Patient p;
    mapping(bytes32 => Patient) patientnameToPatient;
+   mapping(address => Patient) patientAddressToPatient;
 
    function registerPatient(bytes32 patientName, bytes memory ipfsHash) public returns(bool) {
      require(!hasPatient(msg.sender),
             "Sender not authorized.");
      require(!patientNameTaken(patientName),
             "Patient name has been taken.");
-      patientnameToPatient[patientName] = new Patient(patientName, ipfsHash);
+      patientnameToPatient[patientName] = patientAddressToPatient[msg.sender] = new Patient(patientName, ipfsHash);
       addresses.push(msg.sender);
       patientUnames.push(patientName);
       ipfsHashes.push(ipfsHash);
@@ -119,43 +120,59 @@ contract PatientStorage {
     }
 
    function consultationCreate(bytes32 _pname, bytes32 _consulDateID, bytes memory newPatientIpfs)public returns(bool){
-      return p.consultationCreate(_pname, _consulDateID, newPatientIpfs);
+      return patientnameToPatient[_pname].consultationCreate(_pname, _consulDateID, newPatientIpfs);
     }
 
-   function getConsultationByConsultationIndex(uint _index) public view returns(bytes32 consulID){
-      return p.getConsultationByConsultationIndex(_index);
+   function getConsultationByConsultationIndex(bytes32 patientName, uint _index) public view returns(bytes32 consulID){
+      return patientnameToPatient[patientName].getConsultationByConsultationIndex(_index);
     }
-   function getConsultationIndexByConsultationID(bytes32 _consulDateID) public view returns(uint){
-      return p.getConsultationIndexByConsultationID(_consulDateID);
+   function getConsultationIndexByConsultationID(bytes32 patientName, bytes32 _consulDateID) public view returns(uint){
+      return patientnameToPatient[patientName].getConsultationIndexByConsultationID(_consulDateID);
     }
 
    function getConsultationsByPatientName(bytes32 _pname) public view returns(bytes32[] memory){
-      return p.getConsultationsByPatientName(_pname);
+      require(hasPatient(getAddressByIndex(patientnameToIndex[_pname])),"Patient hasn't been found.");
+      return patientnameToPatient[_pname].getConsultationsByPatientName(_pname);
     }
 
    function getConsultationsByPatientAddress(address patientAddress) public view returns(bytes32[] memory){
-      return p.getConsultationsByPatientAddress(patientAddress);
+      return patientAddressToPatient[patientAddress].getConsultationsByPatientAddress(patientAddress);
     }
    function testCreate(bytes32 _pname, bytes32 _testDateID, bytes memory newPatientIpfs)public returns(bool){
-      return p.testCreate(_pname,_testDateID,newPatientIpfs);
+      return patientnameToPatient[_pname].testCreate(_pname,_testDateID,newPatientIpfs);
     }
 
-   function getTestByTestIndex(uint _index) public view returns(bytes32 testID){
-      return p.getTestByTestIndex(_index);
+   function getTestByTestIndex(bytes32 patientName, uint _index) public view returns(bytes32 testID){
+      return patientnameToPatient[patientName].getTestByTestIndex(_index);
     }
 
-   function getTestIndexByTestID(bytes32 _testDateID) public view returns(uint){
-      return p.getTestIndexByTestID(_testDateID);
+   function getTestIndexByTestID(bytes32 patientName, bytes32 _testDateID) public view returns(uint){
+      return patientnameToPatient[patientName].getTestIndexByTestID(_testDateID);
     }
 
    function getTestsByPatientName(bytes32 _pname) public view returns(bytes32[] memory) {
-      return p.getTestsByPatientName(_pname);
+      return patientnameToPatient[_pname].getTestsByPatientName(_pname);
     }
 
    function getTestsByPatientAddress(address patientAddress) public view returns(bytes32[] memory){
       return p.getTestsByPatientAddress(patientAddress);
     }
-   function getTestsCount() public view returns (uint){
-      return p.getTestsCount();
+   function getTestsCount(bytes32 patientName) public view returns (uint){
+      return patientnameToPatient[patientName].getTestsCount();
     }
+   function saveMedicineForPatientUse(bytes32 patientName, bytes32 consulDateID,bytes32 mname) public returns(bool){
+      return patientnameToPatient[patientName].saveMedicineForPatientUse(consulDateID,mname);
+    }
+   function getMedicinesFromConsultation(bytes32 patientName, bytes32 consulDateID) public view returns(bytes32[] memory){
+      return patientnameToPatient[patientName].getMedicinesFromConsultation(consulDateID);
+     }
+   function getMedicineByIndex(bytes32 patientName, bytes32 _consulDateID,uint index) public view returns(bytes32){
+        return patientnameToPatient[patientName].getMedicineByIndex(_consulDateID,index);
+     }
+   function getMedicineByMedicineName(bytes32 patientName, bytes32 _consulDateID, bytes32 medname)public view returns(bytes32){
+        return patientnameToPatient[patientName].getMedicineByMedicineName(_consulDateID, medname);
+     }
+   function getMedicinesCountFromConsultation(bytes32 patientName, bytes32 _consulDateID) public view returns(uint){
+      return patientnameToPatient[patientName].getMedicinesCountFromConsultation(_consulDateID);
+  }
 }
