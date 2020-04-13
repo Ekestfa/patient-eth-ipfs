@@ -1,12 +1,12 @@
 // import { ipfs } from '../_constants';
 import contract from 'truffle-contract';
 import {ethers} from 'ethers';
-import PatientIndex from '../abi/PatientIndex.json'
+import client from '../abi/ClientFactory.json'
 
 // array in local storage for registered users
 let users = JSON.parse(localStorage.getItem('users')) || [];
-
-var Patient = contract(PatientIndex);
+var DeployedClient = contract(client);
+// var Patient = contract(PatientIndex);
 const web3 = new Web3(Web3.givenProvider || "http://localhost:7545" );
 const ethereum = window.ethereum;
 const IPFS = require('ipfs-http-client');
@@ -106,18 +106,19 @@ export function configureFakeBackend() {
                     
                     var valuesBuffer = Buffer.from(JSON.stringify(opts.body)); //values.ETHaddress + values.username + ipfsHash
                     console.log("3")
-                    Patient.setProvider(web3.currentProvider);
+                    DeployedClient.setProvider(web3.currentProvider);
+
                     var usnameByte32 = ethers.utils.formatBytes32String(newUser.username);
                     web3.eth.defaultAccount = users.ethadd
                     console.log("4")
                     ipfs.add(valuesBuffer, (error, result) =>{
                       console.log("fake-backend register-IPFS.ADD")
                       if(error){
-                        console.error(error)
+                        console.error("ipfs error")
                         return
                       }
                       console.log(result[0].hash)
-                      Patient.deployed().then(function(contractInstance){
+                      DeployedClient.deployed().then(function(contractInstance){
                         contractInstance.registerPatient(usnameByte32, Buffer.from(result[0].hash),{gas: 6721975 ,from: ethereum.selectedAddress}).then(function(success){
                             console.log("fake-backend register-CONTRACT REGISTER")
                           if(success){

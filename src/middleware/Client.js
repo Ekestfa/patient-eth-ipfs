@@ -13,9 +13,6 @@ const ethereum = window.ethereum;
 const IPFS = require('ipfs-http-client');
 const ipfs = new IPFS({host:'ipfs.infura.io', port:'5001', protocol: 'HTTPS'});
 
-
-
-
 var valuesBuffer = Buffer.from(JSON.stringify(opts.body)); //values.ETHaddress + values.username + ipfsHash
 console.log("3")
 Patient.setProvider(web3.currentProvider);

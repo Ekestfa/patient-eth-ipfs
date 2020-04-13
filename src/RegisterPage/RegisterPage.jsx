@@ -14,7 +14,7 @@ class RegisterPage extends React.Component {
                 lastName: '',
                 username: '',
                 password: '',
-                ethadd: 'Please Enable Ethereum'
+                ethadd: ''
             },
             submitted: false
         };
@@ -33,7 +33,6 @@ class RegisterPage extends React.Component {
                 [name]: value
             }
         });
-        
     }
 
     handleSubmit(event) {
@@ -57,19 +56,21 @@ class RegisterPage extends React.Component {
                 web3.eth.getAccounts(console.log);
                 ethereum.on('accountsChanged',function(accounts){
                 console.log(ethereum.selectedAddress)
-                console.log('its ok')
                 this.setState({user:{ethadd: ethereum.selectedAddress}})
-                user.ethadd = ethereum.selectedAddress
+                // this.state.user.ethadd = ethereum.selectedAddress
+                web3.currentProvider.publicConfigStore.on('update', callback);
               });
               }
             });
           }
           ethereum.on('accountsChanged',function(accounts){
             this.setState({user:{ethadd: ethereum.selectedAddress}})
-            this.state.user.ethadd = ethereum.selectedAddress
+            // this.state.user.ethadd = ethereum.selectedAddress
+            web3.currentProvider.publicConfigStore.on('update', callback);
           })
           this.setState({user:{ethadd: ethereum.selectedAddress}})
-          this.state.user.ethadd = ethereum.selectedAddress
+        //   this.state.user.ethadd = ethereum.selectedAddress
+          web3.currentProvider.publicConfigStore.on('update', callback);
         }
 
     render() {

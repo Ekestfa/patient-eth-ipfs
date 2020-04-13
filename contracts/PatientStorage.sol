@@ -118,7 +118,7 @@ contract PatientStorage {
             "Can't find the patient!");
       return ipfsHashes[patientnameToIndex[patientname]];
     }
-
+  // CONSULTATIONS
    function consultationCreate(bytes32 _pname, bytes32 _consulDateID, bytes memory newPatientIpfs)public returns(bool){
       return patientnameToPatient[_pname].consultationCreate(_pname, _consulDateID, newPatientIpfs);
     }
@@ -138,6 +138,7 @@ contract PatientStorage {
    function getConsultationsByPatientAddress(address patientAddress) public view returns(bytes32[] memory){
       return patientAddressToPatient[patientAddress].getConsultationsByPatientAddress(patientAddress);
     }
+  // TESTS
    function testCreate(bytes32 _pname, bytes32 _testDateID, bytes memory newPatientIpfs)public returns(bool){
       return patientnameToPatient[_pname].testCreate(_pname,_testDateID,newPatientIpfs);
     }
@@ -160,6 +161,7 @@ contract PatientStorage {
    function getTestsCount(bytes32 patientName) public view returns (uint){
       return patientnameToPatient[patientName].getTestsCount();
     }
+  // MEDICINES
    function saveMedicineForPatientUse(bytes32 patientName, bytes32 consulDateID,bytes32 mname) public returns(bool){
       return patientnameToPatient[patientName].saveMedicineForPatientUse(consulDateID,mname);
     }
