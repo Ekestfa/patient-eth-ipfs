@@ -3,10 +3,11 @@ import { userService } from '../_services';
 import { alertActions } from './';
 import { history } from '../_helpers';
 
+
 export const userActions = {
     login,
     logout,
-    enableEthereum,
+    // enableEthereum,
     register,
     //
     // consultationCreate,
@@ -23,35 +24,35 @@ export const userActions = {
     delete: _delete
 };
 
-function enableEthereum(ethereum){
-    return dispatch => {
-        dispatch(request(ethereum));
+// function enableEthereum(ethereum){
+//     return dispatch => {
+//         dispatch(request(ethereum));
 
-        if(ethereum){
-        web3.eth.getAccounts((err, accounts) => {
-          if (accounts.length === 0) {
-            // there is no active accounts in MetaMask
-            this.console.log('there is no active accounts in MetaMask')
-          }else {
-            // It's ok
-              web3.eth.getAccounts(console.log);
-              ethereum.on('accountsChanged',function(accounts){
-              console.log(ethereum.selectedAddress)
-              console.log('its ok')
-              this.setState({user:{ethadd: ethereum.selectedAddress}})
-              user.ethadd = ethereum.selectedAddress
-            });
-            }
-          });
-        }
-        ethereum.on('accountsChanged',function(accounts){
-          this.setState({user:{ethadd: ethereum.selectedAddress}})
-          this.state.user.ethadd = ethereum.selectedAddress
-        })
-        this.setState({user:{ethadd: ethereum.selectedAddress}})
-        this.state.user.ethadd = ethereum.selectedAddress
-    };
-}
+//         if(ethereum){
+//         web3.eth.getAccounts((err, accounts) => {
+//           if (accounts.length === 0) {
+//             // there is no active accounts in MetaMask
+//             this.console.log('there is no active accounts in MetaMask')
+//           }else {
+//             // It's ok
+//               web3.eth.getAccounts(console.log);
+//               ethereum.on('accountsChanged',function(accounts){
+//               console.log(ethereum.selectedAddress)
+//               console.log('its ok')
+//               this.setState({user:{ethadd: ethereum.selectedAddress}})
+//               user.ethadd = ethereum.selectedAddress
+//             });
+//             }
+//           });
+//         }
+//         ethereum.on('accountsChanged',function(accounts){
+//           this.setState({user:{ethadd: ethereum.selectedAddress}})
+//           this.state.user.ethadd = ethereum.selectedAddress
+//         })
+//         this.setState({user:{ethadd: ethereum.selectedAddress}})
+//         this.state.user.ethadd = ethereum.selectedAddress
+//     };
+// }
 
 
 function login(username, password) {

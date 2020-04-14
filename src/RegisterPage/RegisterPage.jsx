@@ -14,7 +14,7 @@ class RegisterPage extends React.Component {
                 lastName: '',
                 username: '',
                 password: '',
-                ethadd: ''
+                ethadd: 'Enable the Ethereum'
             },
             submitted: false
         };
@@ -46,32 +46,30 @@ class RegisterPage extends React.Component {
     }
 
     ethereumButton(){
+        const { user, submitted } = this.state;
         if(ethereum){
           web3.eth.getAccounts((err, accounts) => {
             if (accounts.length === 0) {
-              // there is no active accounts in MetaMask
-              this.console.log('there is no active accounts in MetaMask')
+                // there is no active accounts in MetaMask
+                this.console.log('there is no active accounts in MetaMask')
             }else {
-              // It's ok
+                // It's ok
                 web3.eth.getAccounts(console.log);
                 ethereum.on('accountsChanged',function(accounts){
-                console.log(ethereum.selectedAddress)
-                this.setState({user:{ethadd: ethereum.selectedAddress}})
-                // this.state.user.ethadd = ethereum.selectedAddress
-                web3.currentProvider.publicConfigStore.on('update', callback);
-              });
-              }
-            });
-          }
-          ethereum.on('accountsChanged',function(accounts){
-            this.setState({user:{ethadd: ethereum.selectedAddress}})
-            // this.state.user.ethadd = ethereum.selectedAddress
-            web3.currentProvider.publicConfigStore.on('update', callback);
-          })
-          this.setState({user:{ethadd: ethereum.selectedAddress}})
-        //   this.state.user.ethadd = ethereum.selectedAddress
-          web3.currentProvider.publicConfigStore.on('update', callback);
-        }
+                    console.log(ethereum.selectedAddress)
+                    this.setState({user:{ethadd: ethereum.selectedAddress}})
+                    user.ethadd = ethereum.selectedAddress
+                });
+            }
+        });
+    }
+    ethereum.on('accountsChanged',function(accounts){
+        this.setState({user:{ethadd: ethereum.selectedAddress}})
+        user.ethadd = ethereum.selectedAddress
+    })
+    this.setState({user:{ethadd: ethereum.selectedAddress}})
+    user.ethadd = ethereum.selectedAddress
+    }
 
     render() {
         const { registering  } = this.props;
@@ -113,7 +111,7 @@ class RegisterPage extends React.Component {
                         <input type="text"
                         name="ethadd" 
                         className="form-control" id="sign-up-eth-address" 
-                        default value={user.ethadd ||""}
+                        value={user.ethadd ||""}
                         disabled
                         onChange={this.handleChange}
                         />
