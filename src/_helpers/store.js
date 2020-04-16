@@ -11,4 +11,5 @@ export const store = createStore(
         thunkMiddleware,
         loggerMiddleware
     )
+    
 );

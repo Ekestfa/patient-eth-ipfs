@@ -1,27 +1,38 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { connect } from 'react-redux';
+import { connect, useStore } from 'react-redux';
 // import {ipfs} from '../_constants';
-import { userActions } from '../_actions';
+// import { userActions } from '../_actions';
+import {userActions} from '../_actions'
+import { store } from '../_helpers';
 
 class RegisterPage extends React.Component {
     constructor(props) {
         super(props);
-        
+
         this.state = {
             user: {
                 firstName: '',
                 lastName: '',
                 username: '',
                 password: '',
-                ethadd: 'Enable the Ethereum'
+                ethadd: 'Please Enable Ethereum'
             },
             submitted: false
         };
-
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
         this.ethereumButton = this.ethereumButton.bind(this);
+        // store.subscribe(() => {
+        //     // When state will be updated(in our case, when items will be fetched), 
+        //     // we will update local component state and force component to rerender 
+        //     // with new data.
+                
+        //     this.setState({
+        //         user:{ethadd: this.props.changedEthAddr}
+                
+        //     });
+        // });
     }
 
     handleChange(event) {
@@ -45,35 +56,36 @@ class RegisterPage extends React.Component {
         }
     }
 
+      
+
     ethereumButton(){
-        const { user, submitted } = this.state;
         if(ethereum){
-          web3.eth.getAccounts((err, accounts) => {
-            if (accounts.length === 0) {
-                // there is no active accounts in MetaMask
-                this.console.log('there is no active accounts in MetaMask')
-            }else {
-                // It's ok
-                web3.eth.getAccounts(console.log);
-                ethereum.on('accountsChanged',function(accounts){
-                    console.log(ethereum.selectedAddress)
-                    this.setState({user:{ethadd: ethereum.selectedAddress}})
-                    user.ethadd = ethereum.selectedAddress
-                });
-            }
-        });
-    }
-    ethereum.on('accountsChanged',function(accounts){
-        this.setState({user:{ethadd: ethereum.selectedAddress}})
-        user.ethadd = ethereum.selectedAddress
-    })
-    this.setState({user:{ethadd: ethereum.selectedAddress}})
-    user.ethadd = ethereum.selectedAddress
-    }
+        web3.eth.getAccounts((err, accounts) => {
+          if (accounts.length === 0) {
+              // there is no active accounts in MetaMask
+              this.console.log('there is no active accounts in MetaMask')
+          }else {
+              // It's ok
+              this.props.enableEthereum(ethereum.selectedAddress)
+              this.setState({user:{ethadd:this.props.changedEthAddr}})
+              web3.eth.getAccounts("ETHEREUM ACCOUNT:" + console.log);
+              ethereum.on('accountsChanged',function(accounts){
+                console.log("ethereum.on")
+                this.setState({user:{ethadd:this.props.changedEthAddr}})
+              });
+          }
+      });
+  }
+  ethereum.on('accountsChanged',function(accounts){
+    this.setState({user:{ethadd:this.props.changedEthAddr}})
+  })
+    this.setState({user:{ethadd:this.props.changedEthAddr}})
+}
 
     render() {
-        const { registering  } = this.props;
+        const { registering, ethadd } = this.props;
         const { user, submitted } = this.state;
+        console.log(user.ethadd)
         return (
             <div className="col-md-6 col-md-offset-3">
                 <h2>Register</h2>
@@ -111,7 +123,7 @@ class RegisterPage extends React.Component {
                         <input type="text"
                         name="ethadd" 
                         className="form-control" id="sign-up-eth-address" 
-                        value={user.ethadd ||""}
+                        value={user.ethadd}
                         disabled
                         onChange={this.handleChange}
                         />
@@ -130,14 +142,23 @@ class RegisterPage extends React.Component {
     }
 }
 
-function mapState(state) {
-    const { registering } = state.registration;
-    return { registering };
+
+function mapStateToProps(state){
+    // const { registering, ethadd } = state;//.registration;
+    // return { registering, ethadd };
+    // return { ethadd : state.ethadd}
+    // const {ethadd} = state
+    // console.log(ethadd)
+    // return {ethadd}
+    return {
+        changedEthAddr: state.ethaddr
+    }
 }
 
 const actionCreators = {
-    register: userActions.register
+    // register: userActions.register,
+    enableEthereum: userActions.enableEthereum
 }
 
-const connectedRegisterPage = connect(mapState, actionCreators)(RegisterPage);
+const connectedRegisterPage = connect(mapStateToProps, actionCreators)(RegisterPage);
 export { connectedRegisterPage as RegisterPage };

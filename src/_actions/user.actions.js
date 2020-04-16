@@ -1,13 +1,12 @@
 import { userConstants } from '../_constants';
-import { userService } from '../_services';
-import { alertActions } from './';
 import { history } from '../_helpers';
+import { store } from "../_helpers"
 
 
 export const userActions = {
     login,
     logout,
-    // enableEthereum,
+    enableEthereum,
     register,
     //
     // consultationCreate,
@@ -24,34 +23,40 @@ export const userActions = {
     delete: _delete
 };
 
-// function enableEthereum(ethereum){
-//     return dispatch => {
-//         dispatch(request(ethereum));
+function enableEthereum(ethadd){
+    const action = {
+        type: userConstants.ENABLED_ETHEREUM,
+        payload: ethadd
+    }
+    // dispatch(action)
+    return store.dispatch(action)
+}
 
-//         if(ethereum){
+// function enableEthereum(web3acc){
+//     if(ethereum){
 //         web3.eth.getAccounts((err, accounts) => {
 //           if (accounts.length === 0) {
-//             // there is no active accounts in MetaMask
-//             this.console.log('there is no active accounts in MetaMask')
+//               // there is no active accounts in MetaMask
+//               this.console.log('there is no active accounts in MetaMask')
 //           }else {
-//             // It's ok
+//               // It's ok
 //               web3.eth.getAccounts(console.log);
 //               ethereum.on('accountsChanged',function(accounts){
-//               console.log(ethereum.selectedAddress)
-//               console.log('its ok')
-//               this.setState({user:{ethadd: ethereum.selectedAddress}})
-//               user.ethadd = ethereum.selectedAddress
-//             });
-//             }
-//           });
-//         }
-//         ethereum.on('accountsChanged',function(accounts){
-//           this.setState({user:{ethadd: ethereum.selectedAddress}})
-//           this.state.user.ethadd = ethereum.selectedAddress
-//         })
-//         this.setState({user:{ethadd: ethereum.selectedAddress}})
-//         this.state.user.ethadd = ethereum.selectedAddress
-//     };
+//                 // KOD BURAYA GELIYOR
+//                 // BURADA BIR SEY YAPMALIYIM KI, ETHEREUM ADDRESSI DONSUN
+//                 //   return dispatch(ethereum.selectedAddress);
+//                 setState({user:{ethadd: ethereum.selectedAddress}})
+//                 user.ethadd = ethereum.selectedAddress
+//               });
+//           }
+//       });
+//   }
+//   ethereum.on('accountsChanged',function(accounts){
+//       setState({user:{ethadd: ethereum.selectedAddress}})
+//       user.ethadd = ethereum.selectedAddress
+//   })
+//       setState({user:{ethadd: ethereum.selectedAddress}})
+//       user.ethadd = ethereum.selectedAddress
 // }
 
 
@@ -59,26 +64,27 @@ function login(username, password) {
     return dispatch => {
         dispatch(request({ username }));
 
-        userService.login(username, password)
-            .then(
-                user => { 
-                    dispatch(success(user));
-                    history.push('/');
-                },
-                error => {
-                    dispatch(failure(error.toString()));
-                    dispatch(alertActions.error(error.toString()));
-                }
-            );
-    };
+    //     userService.login(username, password)
+    //         .then(
+    //             user => { 
+    //                 dispatch(success(user));
+    //                 history.push('/');
+    //             },
+    //             error => {
+    //                 dispatch(failure(error.toString()));
+    //                 dispatch(alertActions.error(error.toString()));
+    //             }
+    //         );
+    // };
 
     function request(user) { return { type: userConstants.LOGIN_REQUEST, user } }
     function success(user) { return { type: userConstants.LOGIN_SUCCESS, user } }
     function failure(error) { return { type: userConstants.LOGIN_FAILURE, error } }
+    }
 }
 
 function logout() {
-    userService.logout();
+    // userService.logout();
     return { type: userConstants.LOGOUT };
 }
 
@@ -86,18 +92,18 @@ function register(user) {
     return dispatch => {
         dispatch(request(user));
 
-        userService.register(user)
-            .then(
-                user => { 
-                    dispatch(success());
-                    history.push('/login');
-                    dispatch(alertActions.success('Registration successful'));
-                },
-                error => {
-                    dispatch(failure(error.toString()));
-                    dispatch(alertActions.error(error.toString()));
-                }
-            );
+        // userService.register(user)
+        //     .then(
+        //         user => { 
+        //             dispatch(success());
+        //             history.push('/login');
+        //             dispatch(alertActions.success('Registration successful'));
+        //         },
+        //         error => {
+        //             dispatch(failure(error.toString()));
+        //             dispatch(alertActions.error(error.toString()));
+        //         }
+        //     );
     };
 
     function request(user) { return { type: userConstants.REGISTER_REQUEST, user } }

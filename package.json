@@ -1,9 +1,9 @@
 {
-  "name": "react-redux-registration-login-example",
+  "name": "patient-eth",
   "version": "1.0.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cornflourblue/react-redux-registration-login-example.git"
+    "url": ""
   },
   "license": "MIT",
   "scripts": {
@@ -11,6 +11,7 @@
     "start": "webpack-dev-server --open"
   },
   "dependencies": {
+    "@babel/runtime": "^7.9.2",
     "bootstrap": "^4.4.1",
     "cids": "^0.8.0",
     "ethers": "^4.0.46",
@@ -35,7 +36,7 @@
     "@babel/preset-env": "^7.9.5",
     "@babel/preset-react": "^7.9.4",
     "babel-loader": "^8.1.0",
-    "html-webpack-plugin": "^4.0.4",
+    "html-webpack-plugin": "^4.2.0",
     "multicodec": "^1.0.1",
     "path": "^0.12.7",
     "webpack": "^4.42.1",

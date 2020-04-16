@@ -71,7 +71,7 @@ class LoginPage extends React.Component {
 }
 
 function mapState(state) {
-    const { loggingIn } = state.authentication;
+    const { loggingIn } = state; //= state.authentication;
     return { loggingIn };
 }
 
